@@ -31,7 +31,7 @@ import sys
 def setup(help_text: str):
     setuptools.setup(
         name="elfs",
-        version="0.3.3",
+        version="0.3.4",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
@@ -277,7 +277,7 @@ def main() -> int:
     # build command
     if command_type == "file":
         command_bin = config["executables"][os.path.splitext(command_file_path)[1]]
-        command = '"' + command_bin + '" "' + command_file_path + '"'
+        command = command_bin + ' "' + command_file_path + '"'
         if forward_args:
             command = command + " " + " ".join(forward_args)
     elif command_type == "spellbook":

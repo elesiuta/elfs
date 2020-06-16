@@ -25,6 +25,7 @@ import difflib
 import json
 import os
 import setuptools
+import subprocess
 import sys
 
 
@@ -277,9 +278,7 @@ def main() -> int:
     # build command
     if command_type == "file":
         command_bin = config["executables"][os.path.splitext(command_file_path)[1]]
-        command = command_bin + ' "' + command_file_path + '"'
-        if forward_args:
-            command = command + " " + " ".join(forward_args)
+        command = [command_bin, command_file_path] + forward_args
     elif command_type == "spellbook":
         command = spell["cmd"]
         if spell["replace-str"]:
@@ -288,12 +287,13 @@ def main() -> int:
             else:
                 for forward_arg in forward_args:
                     command = command.replace(spell["replace-str"], forward_arg, 1)
+        command = [command]
     # execute command
     if args.dry_run:
-        print(colourStr("Command: ", "B") + command)
+        print(colourStr("Command: ", "B") + " ".join(command))
         return 0
     else:
-        return os.system(command)
+        return subprocess.Popen(command).wait()
 
 
 if __name__ == "__main__":

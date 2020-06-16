@@ -1,1 +1,1 @@
-# eric-temporary-name-
+# Electronic gRImoire Collection (temporary name)

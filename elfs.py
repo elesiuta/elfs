@@ -30,8 +30,8 @@ import sys
 
 def setup(help_text: str):
     setuptools.setup(
-        name="ELFS",
-        version="0.3.2",
+        name="elfs",
+        version="0.3.3",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
@@ -96,14 +96,7 @@ def main() -> int:
                          help="Search entire collection for command")
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
                         help="Print command instead of executing it")
-    parser.add_argument("--setup", dest="setup", action="store_true",
-                        help=argparse.SUPPRESS)
     args = parser.parse_args()
-    # building
-    if args.setup:
-        sys.argv.remove("--setup")
-        setup("```\n" + parser.format_help() + "\n```")
-        return 0
     # init config
     config_path = os.path.join(os.path.expanduser("~"), ".config", "elfs", "config.json")
     config = readJson(config_path)
@@ -182,6 +175,7 @@ def main() -> int:
     # list collection
     if args.list:
         print(colourStr("Config path: ", "V") + config_path)
+        print(colourStr("Spellbook path: ", "V") + config["spellbook"])
         if not args.command or args.command[0][0] == "e":
             print(colourStr("Known extensions and associated executables", "V"))
             for ext in config["executables"]:
@@ -200,9 +194,10 @@ def main() -> int:
                     last_directory = file_dict[file_name]
                     print(colourStr(last_directory, "B"))
                 print(file_name)
-            print(colourStr("Extra files (duplicate names)", "V"))
-            for file_path in file_extra:
-                print(file_path)
+            if file_extra:
+                print(colourStr("Extra files (duplicate names)", "V"))
+                for file_path in file_extra:
+                    print(file_path)
             print("")
         if not args.command or args.command[0][0] == "c":
             print(colourStr("Commands found in spell book", "V"))
@@ -213,6 +208,8 @@ def main() -> int:
                 spell_str += colourStr("Replace-str: ", "B") + spell["replace-str"] + "\n"
                 spell_str += colourStr("Command: ", "B") + spell["cmd"] + "\n"
                 print(spell_str)
+            if not spellbook["spells"]:
+                print("")
         return 0
     # search collection
     if args.search:
@@ -261,6 +258,9 @@ def main() -> int:
             return 0
     # exact match only if not searching
     if not args.search:
+        if not args.command:
+            parser.print_usage()
+            return 0
         if args.command[0] in file_dict:
             command_type = "file"
             forward_args = args.command[1:]

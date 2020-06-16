@@ -1,4 +1,3 @@
-import sys
 import elfs
 
 help_text = """```
@@ -18,4 +17,3 @@ optional arguments:
   -n, --dry-run     Print command instead of executing it
 ```"""
 elfs.setup(help_text)
-

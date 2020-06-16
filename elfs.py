@@ -32,7 +32,7 @@ def setup(help_text: str):
     setuptools.setup(
         name="ELFS",
         version="0.3.0",
-        description="Easy Launcher For Shell",
+        description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
         url="https://github.com/elesiuta/elfs",
@@ -75,7 +75,7 @@ def writeJson(file_path: str, data: dict) -> None:
 
 def main() -> int:
     # argparse
-    parser = argparse.ArgumentParser(description="Electronic gRImoire Collection",
+    parser = argparse.ArgumentParser(description="Easy Launcher For (the) Shell",
                                      usage="%(prog)s [options] [command [initial-arguments ...]]")
     parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

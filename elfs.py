@@ -287,8 +287,7 @@ def main() -> int:
             for i in range(len(command)):
                 while spell["replace-str"] in command[i]:
                     command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
-                    if j + 1 < len(forward_args):
-                        j += 1
+                    j = min(j + 1, len(forward_args) - 1)
     # execute command
     if args.dry_run:
         print(colourStr("Command: ", "B") + " ".join(command))

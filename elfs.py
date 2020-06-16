@@ -31,7 +31,7 @@ import sys
 def setup(help_text: str):
     setuptools.setup(
         name="ELFS",
-        version="0.3.0",
+        version="0.3.1",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
@@ -102,7 +102,7 @@ def main() -> int:
     # building
     if args.setup:
         sys.argv.remove("--setup")
-        setup(parser.format_help())
+        setup("```\n" + parser.format_help() + "\n```")
         return 0
     # init config
     config_path = os.path.join(os.path.expanduser("~"), ".config", "elfs", "config.json")

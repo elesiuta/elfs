@@ -1,13 +1,13 @@
 # Easy Launcher For the Shell (temporary name)
-Install from source with
+### Install from source with
 ```
 python elfs.py --setup install --user
 ```
-Install from PyPI with
+### Install from PyPI with
 ```
 pip install elfs
 ```
-Command Line Interface
+### Command Line Interface
 ```
 usage: elfs [options] [command [initial-arguments ...]]
 

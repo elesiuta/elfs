@@ -25,6 +25,7 @@ import difflib
 import json
 import os
 import setuptools
+import shlex
 import subprocess
 import sys
 
@@ -32,7 +33,7 @@ import sys
 def setup(help_text: str):
     setuptools.setup(
         name="elfs",
-        version="0.3.4",
+        version="0.4.0",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
@@ -155,7 +156,7 @@ def main() -> int:
     # add command
     if args.add_command:
         spell = {
-            "cmd": " ".join(args.command),
+            "cmd": args.command,
             "desc": "",
             "name": "",
             "replace-str": ""
@@ -165,7 +166,7 @@ def main() -> int:
         return 0
     if args.add_command_comments:
         spell = {
-            "cmd": " ".join(args.command),
+            "cmd": args.command,
             "desc": args.add_command_comments[1],
             "name": args.add_command_comments[0],
             "replace-str": args.add_command_comments[2]
@@ -207,7 +208,7 @@ def main() -> int:
                 spell_str += colourStr("Name: ", "B") + spell["name"] + " "
                 spell_str += colourStr("Description: ", "B") + spell["desc"] + " "
                 spell_str += colourStr("Replace-str: ", "B") + spell["replace-str"] + "\n"
-                spell_str += colourStr("Command: ", "B") + spell["cmd"] + "\n"
+                spell_str += colourStr("Command: ", "B") + " ".join(spell["cmd"]) + "\n"
                 print(spell_str)
             if not spellbook["spells"]:
                 print("")
@@ -221,7 +222,7 @@ def main() -> int:
         search_index += [os.path.basename(file_path) for file_path in file_extra]
         search_index += [spell["name"] for spell in spellbook["spells"]]
         search_index += [spell["desc"] for spell in spellbook["spells"]]
-        search_index += [spell["cmd"] for spell in spellbook["spells"]]
+        search_index += [" ".join(spell["cmd"]) for spell in spellbook["spells"]]
         fuzzy_search = difflib.get_close_matches(search_str, search_index)
         for file_name in file_dict:
             if search_str in file_name or file_name in fuzzy_search:
@@ -233,9 +234,9 @@ def main() -> int:
             if (
                 search_str in spell["name"] or spell["name"] in fuzzy_search or
                 search_str in spell["desc"] or spell["desc"] in fuzzy_search or
-                search_str in spell["cmd"] or spell["cmd"] in fuzzy_search
+                search_str in " ".join(spell["cmd"]) or " ".join(spell["cmd"]) in fuzzy_search
             ):
-                search_results.append({"label": spell["cmd"], "type": "spellbook", "spell": spell})
+                search_results.append({"label": " ".join(spell["cmd"]), "type": "spellbook", "spell": spell})
         if len(search_results) == 0:
             print(colourStr("No matches found", "Y"))
             return 0
@@ -246,7 +247,7 @@ def main() -> int:
         print("Supply any extra arguments (if needed) separated by spaces")
         search_input = input(">>> ")
         try:
-            search_input = search_input.split()
+            search_input = shlex.split(search_input)
             search_selection = search_results[int(search_input[0])]
             command_type = search_selection["type"]
             forward_args = search_input[1:]
@@ -281,13 +282,13 @@ def main() -> int:
         command = [command_bin, command_file_path] + forward_args
     elif command_type == "spellbook":
         command = spell["cmd"]
-        if spell["replace-str"]:
-            if len(forward_args) == 1:
-                command = command.replace(spell["replace-str"], forward_args[0])
-            else:
-                for forward_arg in forward_args:
-                    command = command.replace(spell["replace-str"], forward_arg, 1)
-        command = [command]
+        if spell["replace-str"] and forward_args:
+            j = 0
+            for i in range(len(command)):
+                while spell["replace-str"] in command[i]:
+                    command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
+                    if j + 1 < len(forward_args):
+                        j += 1
     # execute command
     if args.dry_run:
         print(colourStr("Command: ", "B") + " ".join(command))

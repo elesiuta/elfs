@@ -208,7 +208,7 @@ def main() -> int:
                 spell_str += colourStr("Name: ", "B") + spell["name"] + " "
                 spell_str += colourStr("Description: ", "B") + spell["desc"] + " "
                 spell_str += colourStr("Replace-str: ", "B") + spell["replace-str"] + "\n"
-                spell_str += colourStr("Command: ", "B") + " ".join(spell["cmd"]) + "\n"
+                spell_str += colourStr("Command: ", "B") + shlex.join(spell["cmd"]) + "\n"
                 print(spell_str)
             if not spellbook["spells"]:
                 print("")
@@ -236,7 +236,7 @@ def main() -> int:
                 search_str in spell["desc"] or spell["desc"] in fuzzy_search or
                 search_str in " ".join(spell["cmd"]) or " ".join(spell["cmd"]) in fuzzy_search
             ):
-                search_results.append({"label": " ".join(spell["cmd"]), "type": "spellbook", "spell": spell})
+                search_results.append({"label": shlex.join(spell["cmd"]), "type": "spellbook", "spell": spell})
         if len(search_results) == 0:
             print(colourStr("No matches found", "Y"))
             return 0
@@ -290,7 +290,7 @@ def main() -> int:
                     j = min(j + 1, len(forward_args) - 1)
     # execute command
     if args.dry_run:
-        print(colourStr("Command: ", "B") + " ".join(command))
+        print(colourStr("Command: ", "B") + shlex.join(command))
         return 0
     else:
         return subprocess.Popen(command).wait()

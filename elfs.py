@@ -138,7 +138,7 @@ def main() -> int:
     file_splitext = {}
     file_extra = []
     for directory in config["directories"]:
-        for file_name in os.listdir(directory):
+        for file_name in sorted(os.listdir(directory)):
             if os.path.isfile(os.path.join(directory, file_name)):
                 if file_name not in file_dict:
                     file_dict[file_name] = directory
@@ -223,7 +223,7 @@ def main() -> int:
         if not args.command or args.command[0][0] == "f":
             print(colourStr("Files found in directories", "V"))
             last_directory = ""
-            for file_name in file_dict:
+            for file_name in sorted(list(file_dict.keys())):
                 if file_dict[file_name] != last_directory:
                     last_directory = file_dict[file_name]
                     print(colourStr(last_directory, "B"))

@@ -135,6 +135,7 @@ def main() -> int:
         }
     # init file dictionary
     file_dict = {}
+    file_splitext = {}
     file_extra = []
     for directory in config["directories"]:
         for file_name in os.listdir(directory):
@@ -143,6 +144,10 @@ def main() -> int:
                     file_dict[file_name] = directory
                 else:
                     file_extra.append(os.path.join(directory, file_name))
+                if os.path.splitext(file_name)[0] not in file_splitext:
+                    file_splitext[os.path.splitext(file_name)[0]] = os.path.splitext(file_name)[1]
+                else:
+                    file_splitext[os.path.splitext(file_name)[0]] = False
     # add dir
     if args.add_dir:
         if not os.path.isdir(args.add_dir):
@@ -176,6 +181,10 @@ def main() -> int:
     spellbook = readJson(config["spellbook"])
     if not spellbook:
         spellbook = {"spells": []}
+    spellbook_dict = {}
+    for spell in spellbook["spells"]:
+        if spell["name"] not in spellbook_dict:
+            spellbook_dict[spell["name"]] = spell
     # add command
     if args.add_command:
         spell = {
@@ -286,16 +295,17 @@ def main() -> int:
         if not args.command:
             parser.print_usage()
             return 0
+        if args.command[0] not in file_dict and args.command[0] not in spellbook_dict:
+            if args.command[0] in file_splitext and file_splitext(args.command[0]):
+                args.command[0] += file_splitext(args.command[0])
         if args.command[0] in file_dict:
             command_type = "file"
             forward_args = args.command[1:]
             command_file_path = os.path.join(file_dict[args.command[0]], args.command[0])
-        elif args.command[0] in [spell["name"] for spell in spellbook["spells"]]:
+        elif args.command[0] in spellbook_dict:
             command_type = "spellbook"
             forward_args = args.command[1:]
-            for spell in spellbook["spells"]:
-                if args.command[0] == spell["name"]:
-                    break
+            spell = spellbook_dict[args.command[0]]
         else:
             print(colourStr("Command not found", "Y"))
             return 0

@@ -71,11 +71,9 @@ def readJson(file_path: str) -> dict:
 def writeJson(file_path: str, data: dict, spellbook: bool = False) -> None:
     if not os.path.isdir(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path))
-    with open(file_path, "w", encoding="utf-8", errors="surrogateescape") as json_file:
-        json.dump(data, json_file, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False)
+    normal_json = json.dumps(data, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False)
     if spellbook:
-        with open(file_path, "r", encoding="utf-8", errors="surrogateescape") as json_file:
-            normal_json = json_file.readlines()
+        normal_json = normal_json.splitlines(keepends=True)
         pretty_json = []
         is_cmd = False
         for line in normal_json:
@@ -95,6 +93,9 @@ def writeJson(file_path: str, data: dict, spellbook: bool = False) -> None:
                 raise Exception("Pretty JSON Error: unexpected command or format")
         with open(file_path, "w", encoding="utf-8", errors="surrogateescape") as json_file:
             json_file.writelines(pretty_json)
+    else:
+        with open(file_path, "w", encoding="utf-8", errors="surrogateescape") as json_file:
+            json_file.write(normal_json)
 
 
 def main() -> int:

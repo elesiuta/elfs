@@ -224,7 +224,7 @@ def main() -> int:
         if not args.command or args.command[0][0] == "f":
             print(colourStr("Files found in directories", "V"))
             last_directory = ""
-            for file_name in file_dict.keys():
+            for file_name in file_dict:
                 if file_dict[file_name] != last_directory:
                     last_directory = file_dict[file_name]
                     print(colourStr(last_directory, "B"))
@@ -291,7 +291,7 @@ def main() -> int:
         except Exception:
             print(colourStr("No match selected", "Y"))
             return 0
-    # exact match only if not searching
+    # exact match only if not searching (file extension optional only if unambiguous)
     if not args.search:
         if not args.command:
             parser.print_usage()

@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import argparse
+import collections
 import difflib
 import json
 import os
@@ -134,7 +135,7 @@ def main() -> int:
             "spellbook": ""
         }
     # init file dictionary
-    file_dict = {}
+    file_dict = collections.OrderedDict()
     file_splitext = {}
     file_extra = []
     for directory in config["directories"]:
@@ -223,7 +224,7 @@ def main() -> int:
         if not args.command or args.command[0][0] == "f":
             print(colourStr("Files found in directories", "V"))
             last_directory = ""
-            for file_name in sorted(list(file_dict.keys())):
+            for file_name in file_dict.keys():
                 if file_dict[file_name] != last_directory:
                     last_directory = file_dict[file_name]
                     print(colourStr(last_directory, "B"))

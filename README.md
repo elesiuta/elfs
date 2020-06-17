@@ -31,10 +31,13 @@ $ elfs -d ~/scripts
 // run your script from any directory
 $ elfs myscript.py arg0 arg1 arg2
 <script output>
+// file extension is implied only if unambiguous
+$ elfs myscript arg0 arg1 arg2
+<script output>
 ```
 ```
-// add an extension and executable for running files in your directory
-$ elfs -e .sh /bin/bash
+// add an extension to run a file with a specific executable
+$ elfs -e .py /path/to/alternative/env/for/python
 ```
 ```
 // add a command
@@ -50,7 +53,7 @@ $ elfs "more spam" bacon spam
 spam bacon eggs spam
 ```
 ```
-// multiple commands (needs to run in a shell, elfs uses Popen shell=False)
+// command chaining (needs to run in a shell, elfs uses Popen shell=False)
 $ elfs -cc "double spam" "" "" bash -c "echo spam && echo spam"
 $ elfs "double spam"
 spam spam

@@ -68,11 +68,33 @@ def readJson(file_path: str) -> dict:
     return {}
 
 
-def writeJson(file_path: str, data: dict) -> None:
+def writeJson(file_path: str, data: dict, spellbook: bool = False) -> None:
     if not os.path.isdir(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path))
     with open(file_path, "w", encoding="utf-8", errors="surrogateescape") as json_file:
         json.dump(data, json_file, indent=2, separators=(',', ': '), sort_keys=True, ensure_ascii=False)
+    if spellbook:
+        with open(file_path, "r", encoding="utf-8", errors="surrogateescape") as json_file:
+            normal_json = json_file.readlines()
+        pretty_json = []
+        is_cmd = False
+        for line in normal_json:
+            if not is_cmd and line != '      "cmd": [\n':
+                pretty_json.append(line)
+            elif line == '      "cmd": [\n':
+                pretty_json.append('      "cmd": [')
+                is_cmd = True
+            elif line == '      ],\n':
+                pretty_json[-1] += '],\n'
+                is_cmd = False
+            elif is_cmd:
+                pretty_json[-1] += line[8:-1]
+                if pretty_json[-1][-1] == ',':
+                    pretty_json += ' '
+            else:
+                raise Exception("Pretty JSON Error: unexpected command or format")
+        with open(file_path, "w", encoding="utf-8", errors="surrogateescape") as json_file:
+            json_file.writelines(pretty_json)
 
 
 def main() -> int:
@@ -162,7 +184,7 @@ def main() -> int:
             "replace-str": ""
         }
         spellbook["spells"].append(spell)
-        writeJson(config["spellbook"], spellbook)
+        writeJson(config["spellbook"], spellbook, True)
         return 0
     if args.add_command_comments:
         spell = {
@@ -172,7 +194,7 @@ def main() -> int:
             "replace-str": args.add_command_comments[2]
         }
         spellbook["spells"].append(spell)
-        writeJson(config["spellbook"], spellbook)
+        writeJson(config["spellbook"], spellbook, True)
         return 0
     # list collection
     if args.list:

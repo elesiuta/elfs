@@ -296,8 +296,8 @@ def main() -> int:
             parser.print_usage()
             return 0
         if args.command[0] not in file_dict and args.command[0] not in spellbook_dict:
-            if args.command[0] in file_splitext and file_splitext(args.command[0]):
-                args.command[0] += file_splitext(args.command[0])
+            if args.command[0] in file_splitext and file_splitext[args.command[0]]:
+                args.command[0] += file_splitext[args.command[0]]
         if args.command[0] in file_dict:
             command_type = "file"
             forward_args = args.command[1:]

@@ -34,7 +34,7 @@ import sys
 def setup(help_text: str):
     setuptools.setup(
         name="elfs",
-        version="0.4.2",
+        version="0.4.4",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",

@@ -202,7 +202,7 @@ def main() -> int:
                     print(file_path)
             print("")
         if not args.command or args.command[0][0] == "c":
-            print(colourStr("Commands found in spell book", "V"))
+            print(colourStr("Commands found in spellbook", "V"))
             for spell in spellbook["spells"]:
                 spell_str = ""
                 spell_str += colourStr("Name: ", "B") + spell["name"] + " "

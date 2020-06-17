@@ -311,8 +311,9 @@ def main() -> int:
             return 0
     # build command
     if command_type == "file":
-        command_bin = config["executables"][os.path.splitext(command_file_path)[1]]
-        command = [command_bin, command_file_path] + forward_args
+        command = [command_file_path] + forward_args
+        if os.path.splitext(command_file_path)[1] in config["executables"]:
+            command.insert(0, config["executables"][os.path.splitext(command_file_path)[1]])
     elif command_type == "spellbook":
         command = spell["cmd"]
         if spell["replace-str"] and forward_args:

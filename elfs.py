@@ -34,7 +34,7 @@ import sys
 def setup(help_text: str):
     setuptools.setup(
         name="elfs",
-        version="0.4.4",
+        version="0.4.5",
         description="Easy Launcher For (the) Shell",
         long_description=help_text,
         long_description_content_type="text/markdown",
@@ -152,7 +152,8 @@ def main() -> int:
     # add dir
     if args.add_dir:
         if not os.path.isdir(args.add_dir):
-            raise Exception("Path not found: %s", args.add_dir)
+            print(colourStr("Path not found: ", "R") + args.add_dir)
+            return 1
         if os.path.abspath(args.add_dir) not in config["directories"]:
             config["directories"].append(os.path.abspath(args.add_dir))
         if not config["spellbook"]:
@@ -161,10 +162,13 @@ def main() -> int:
         return 0
     # add template
     if args.add_template:
-        template_path = os.path.join(file_dict[args.add_template[1]], args.add_template[1])
-        new_script_path = os.path.join(file_dict[args.add_template[1]], args.add_template[0])
-        if not os.path.isfile(template_path) or os.path.isfile(new_script_path):
-            raise Exception("Template either does not exist or new script will overwrite an existing file")
+        try:
+            template_path = os.path.join(file_dict[args.add_template[1]], args.add_template[1])
+            new_script_path = os.path.join(file_dict[args.add_template[1]], args.add_template[0])
+            assert not os.path.isfile(new_script_path)
+        except Exception:
+            print(colourStr("Template either does not exist or new script will overwrite an existing file", "R"))
+            return 1
         with open(template_path, "r") as template_file:
             template = template_file.readlines()
         new_script = []
@@ -206,6 +210,10 @@ def main() -> int:
         }
         spellbook["spells"].append(spell)
         writeJson(config["spellbook"], spellbook, True)
+        if spell["name"] and (spell["name"] in spellbook_dict or spell["name"] in file_dict):
+            warning_msg = colourStr("Warning: ", "Y") + spell["name"]
+            warning_msg += colourStr(" already exists in your collection, only the first entry will run with", "Y")
+            print(warning_msg + " elfs " + spell["name"])
         return 0
     # list collection
     if args.list:

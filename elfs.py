@@ -264,7 +264,7 @@ def main() -> int:
         search_index += [spell["name"] for spell in spellbook["spells"]]
         search_index += [spell["desc"] for spell in spellbook["spells"]]
         search_index += [" ".join(spell["cmd"]) for spell in spellbook["spells"]]
-        fuzzy_search = difflib.get_close_matches(search_str, search_index)
+        fuzzy_search = difflib.get_close_matches(search_str, search_index, cutoff=0.4)
         for file_name in file_dict:
             if search_str in file_name or file_name in fuzzy_search:
                 search_results.append({"label": os.path.join(file_dict[file_name], file_name), "type": "file"})

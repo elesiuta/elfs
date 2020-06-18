@@ -325,12 +325,13 @@ def main() -> int:
             command.insert(0, config["executables"][os.path.splitext(command_file_path)[1]])
     elif command_type == "spellbook":
         command = spell["cmd"]
+        j = -1
         if spell["replace-str"] and forward_args:
-            j = 0
             for i in range(len(command)):
                 while spell["replace-str"] in command[i]:
-                    command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
                     j = min(j + 1, len(forward_args) - 1)
+                    command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
+        command += forward_args[j+1:]
     # execute command
     if args.dry_run:
         print(colourStr("Command: ", "B") + shlex.join(command))

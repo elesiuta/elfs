@@ -157,37 +157,6 @@ def main() -> int:
     for spell in spellbook["spells"]:
         if spell["name"] not in spellbook_dict:
             spellbook_dict[spell["name"]] = spell
-    # add dir
-    if args.add_dir:
-        if not os.path.isdir(args.add_dir):
-            print(colourStr("Path not found: ", "R") + args.add_dir)
-            return 1
-        if os.path.abspath(args.add_dir) not in config["directories"]:
-            config["directories"].append(os.path.abspath(args.add_dir))
-        writeJson(config_path, config)
-        return 0
-    # add template
-    if args.add_template:
-        try:
-            template_path = os.path.join(file_dict[args.add_template[1]], args.add_template[1])
-            new_script_path = os.path.join(file_dict[args.add_template[1]], args.add_template[0])
-            assert not os.path.isfile(new_script_path)
-        except Exception:
-            print(colourStr("Template either does not exist or new script will overwrite an existing file", "R"))
-            return 1
-        with open(template_path, "r") as template_file:
-            template = template_file.readlines()
-        new_script = []
-        for line in template:
-            new_script.append(line.replace("###REPLACE###", " ".join(args.command)))
-        with open(new_script_path, "w") as new_script_file:
-            new_script_file.writelines(new_script)
-        return 0
-    # add extension
-    if args.add_extension:
-        config["executables"][args.add_extension[0]] = args.add_extension[1]
-        writeJson(config_path, config)
-        return 0
     # add command
     if args.add_command:
         spell = {
@@ -213,6 +182,37 @@ def main() -> int:
             warning_msg = colourStr("Warning: ", "Y") + spell["name"]
             warning_msg += colourStr(" already exists in your collection, only the first entry will run with", "Y")
             print(warning_msg + " elfs " + spell["name"])
+        return 0
+    # add template
+    if args.add_template:
+        try:
+            template_path = os.path.join(file_dict[args.add_template[1]], args.add_template[1])
+            new_script_path = os.path.join(file_dict[args.add_template[1]], args.add_template[0])
+            assert not os.path.isfile(new_script_path)
+        except Exception:
+            print(colourStr("Template either does not exist or new script will overwrite an existing file", "R"))
+            return 1
+        with open(template_path, "r") as template_file:
+            template = template_file.readlines()
+        new_script = []
+        for line in template:
+            new_script.append(line.replace("###REPLACE###", " ".join(args.command)))
+        with open(new_script_path, "w") as new_script_file:
+            new_script_file.writelines(new_script)
+        return 0
+    # add extension
+    if args.add_extension:
+        config["executables"][args.add_extension[0]] = args.add_extension[1]
+        writeJson(config_path, config)
+        return 0
+    # add dir
+    if args.add_dir:
+        if not os.path.isdir(args.add_dir):
+            print(colourStr("Path not found: ", "R") + args.add_dir)
+            return 1
+        if os.path.abspath(args.add_dir) not in config["directories"]:
+            config["directories"].append(os.path.abspath(args.add_dir))
+        writeJson(config_path, config)
         return 0
     # list collection
     if args.list:
@@ -298,7 +298,7 @@ def main() -> int:
         except Exception:
             print(colourStr("No match selected", "Y"))
             return 0
-    # find exact match (precedence: files in dir order -> spellbook in list order -> guess file extension if unambiguous)
+    # find exact match (precedence: files in dir order -> spellbook in list order -> imply file extension if unambiguous)
     if not args.search:
         if not args.command:
             parser.print_usage()

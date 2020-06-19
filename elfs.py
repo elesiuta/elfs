@@ -298,7 +298,7 @@ def main() -> int:
         except Exception:
             print(colourStr("No match selected", "Y"))
             return 0
-    # find command (precedence: files in dir order -> spellbook in list order -> guess file extension if unambiguous)
+    # find exact match (precedence: files in dir order -> spellbook in list order -> guess file extension if unambiguous)
     if not args.search:
         if not args.command:
             parser.print_usage()

@@ -76,6 +76,12 @@ Supply any extra arguments (if needed) separated by spaces
 >>> 
 ```
 ```
-// add a command to easily edit your spellbook
-$ elfs -cc "edit" "" "" nano ~/scripts/spellbook.json
+// add a command using your favourite editor to easily edit your config
+$ elfs -cc "config" "" "" nano ~/.config/elfs/config.json
+// or add a command to easily edit your spellbook (you can move this file)
+$ elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json
 ```
+Unless using search (and select), commands are run in the following order of precedence
+- files in order directory listed in config
+- commands from spellbook in order listed
+- imply file extension if unambiguous

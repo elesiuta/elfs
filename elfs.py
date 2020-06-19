@@ -149,6 +149,14 @@ def main() -> int:
                     file_splitext[os.path.splitext(file_name)[0]] = os.path.splitext(file_name)[1]
                 else:
                     file_splitext[os.path.splitext(file_name)[0]] = False
+    # init spellbook
+    spellbook = readJson(config["spellbook"])
+    if not spellbook:
+        spellbook = {"spells": []}
+    spellbook_dict = {}
+    for spell in spellbook["spells"]:
+        if spell["name"] not in spellbook_dict:
+            spellbook_dict[spell["name"]] = spell
     # add dir
     if args.add_dir:
         if not os.path.isdir(args.add_dir):
@@ -180,14 +188,6 @@ def main() -> int:
         config["executables"][args.add_extension[0]] = args.add_extension[1]
         writeJson(config_path, config)
         return 0
-    # init spellbook
-    spellbook = readJson(config["spellbook"])
-    if not spellbook:
-        spellbook = {"spells": []}
-    spellbook_dict = {}
-    for spell in spellbook["spells"]:
-        if spell["name"] not in spellbook_dict:
-            spellbook_dict[spell["name"]] = spell
     # add command
     if args.add_command:
         spell = {
@@ -199,6 +199,7 @@ def main() -> int:
         spellbook["spells"].append(spell)
         writeJson(config["spellbook"], spellbook, True)
         return 0
+    # add command with comments (name, description, replace-str)
     if args.add_command_comments:
         spell = {
             "cmd": args.command,
@@ -252,7 +253,7 @@ def main() -> int:
             if not spellbook["spells"]:
                 print("")
         return 0
-    # search collection
+    # search collection (then prompt for selection to optionally run)
     if args.search:
         search_str = " ".join(args.command)
         search_results = []
@@ -297,7 +298,7 @@ def main() -> int:
         except Exception:
             print(colourStr("No match selected", "Y"))
             return 0
-    # exact match only if not searching (file extension optional only if unambiguous)
+    # find command (precedence: files in dir order -> spellbook in list order -> guess file extension if unambiguous)
     if not args.search:
         if not args.command:
             parser.print_usage()
@@ -316,7 +317,7 @@ def main() -> int:
         else:
             print(colourStr("Command not found", "Y"))
             return 0
-    # build command
+    # build command (from search selection or exact match if not searching)
     if command_type == "file":
         command = [command_file_path] + forward_args
         if os.path.splitext(command_file_path)[1] in config["executables"]:

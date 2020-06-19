@@ -107,21 +107,21 @@ def main() -> int:
                         help=argparse.SUPPRESS)
     maingrp = parser.add_mutually_exclusive_group()
     maingrp.add_argument("-c", dest="add_command", action="store_true",
-                         help="Add the command to your spellbook")
+                         help="add the command to your spellbook")
     maingrp.add_argument("-cc", dest="add_command_comments", metavar=("name", "desc", "rs"), nargs=3,
-                         help="Add the command to your spellbook with comments")
+                         help="add the command to your spellbook with comments")
     maingrp.add_argument("-t", dest="add_template", metavar=("name", "template"), nargs=2,
-                         help="Add the command to a new script from a template")
+                         help="add the command to a new script from a template")
     maingrp.add_argument("-d", dest="add_dir", metavar="path",
-                         help="Add a directory path to your config")
+                         help="add a directory path to your config")
     maingrp.add_argument("-e", dest="add_extension", metavar=(".ext", "path"), nargs=2,
-                         help="Add an extension and the path to an executable for it")
+                         help="add an extension and the path to an executable for it")
     maingrp.add_argument("-l", "--list", dest="list", action="store_true",
-                         help="List entire collection (or specify: cmd, dir, ext, files)")
+                         help="list entire collection (or specify: cmd, dir, ext, files)")
     maingrp.add_argument("-s", "--search", dest="search", action="store_true",
-                         help="Search entire collection for command")
+                         help="search entire collection for command")
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
-                        help="Print command instead of executing it")
+                        help="print command instead of executing it")
     args = parser.parse_args()
     # init config
     config_path = os.path.join(os.path.expanduser("~"), ".config", "elfs", "config.json")

@@ -132,7 +132,7 @@ def main() -> int:
             "executables": {
                 ".py": sys.executable
             },
-            "spellbook": ""
+            "spellbook": os.path.join(os.path.expanduser("~"), ".config", "elfs", "spellbook.json")
         }
     # init file dictionary
     file_dict = collections.OrderedDict()
@@ -156,8 +156,6 @@ def main() -> int:
             return 1
         if os.path.abspath(args.add_dir) not in config["directories"]:
             config["directories"].append(os.path.abspath(args.add_dir))
-        if not config["spellbook"]:
-            config["spellbook"] = os.path.join(os.path.abspath(args.add_dir), "spellbook.json")
         writeJson(config_path, config)
         return 0
     # add template

@@ -82,6 +82,6 @@ Supply any extra arguments (if needed) separated by spaces
 > elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json
 ```
 Unless using search (and select), commands are selected in the following order of precedence
-1. files in order directory listed in config
+1. files in order of directory listed in config
 2. commands from spellbook in order listed
 3. imply file extension if unambiguous

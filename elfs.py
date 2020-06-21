@@ -110,8 +110,6 @@ def main() -> int:
                          help="add the command to your spellbook")
     maingrp.add_argument("-cc", dest="add_command_comments", metavar=("name", "desc", "rs"), nargs=3,
                          help="add the command to your spellbook with comments")
-    maingrp.add_argument("-t", dest="add_template", metavar=("name", "template"), nargs=2,
-                         help="add the command to a new script from a template")
     maingrp.add_argument("-d", dest="add_dir", metavar="path",
                          help="add a directory path to your config")
     maingrp.add_argument("-e", dest="add_extension", metavar=(".ext", "path"), nargs=2,
@@ -182,23 +180,6 @@ def main() -> int:
             warning_msg = colourStr("Warning: ", "Y") + spell["name"]
             warning_msg += colourStr(" already exists in your collection, only the first entry will run with", "Y")
             print(warning_msg + " elfs " + spell["name"])
-        return 0
-    # add template
-    if args.add_template:
-        try:
-            template_path = os.path.join(file_dict[args.add_template[1]], args.add_template[1])
-            new_script_path = os.path.join(file_dict[args.add_template[1]], args.add_template[0])
-            assert not os.path.isfile(new_script_path)
-        except Exception:
-            print(colourStr("Template either does not exist or new script will overwrite an existing file", "R"))
-            return 1
-        with open(template_path, "r") as template_file:
-            template = template_file.readlines()
-        new_script = []
-        for line in template:
-            new_script.append(line.replace("###REPLACE###", " ".join(args.command)))
-        with open(new_script_path, "w") as new_script_file:
-            new_script_file.writelines(new_script)
         return 0
     # add extension
     if args.add_extension:

@@ -23,64 +23,52 @@ optional arguments:
   -s, --search      search entire collection for command
   -n, --dry-run     print command instead of executing it
 ```
+### Usage Notes
+- Runs on any platform with python 3
+- Unless using search (and select), the default behaviour is to find a command using exact matches only, and is selected in the following order of precedence
+  1. files in order of directories listed in config
+  2. names of commands from spellbook in order listed
+  3. imply file extension if possible and unambiguous
+- Commands without names (or duplicate names of lower precedence) can only be run via search
+- Commands and files with spaces in their names need to be escaped or in quotes
+- The first argument (that is not an option for elfs) is treated as the command or filename and all subsequent arguments are passed to the command or file to be executed (except for commands with a replace-str, see example)
+- Pipes work as expected, you can pipe into or out from any command or file, however if you try piping into a search, it will interpret that as your selection
 ### Examples
-```fish
-# add a directory
-> elfs -d ~/scripts
-# run your script from any directory
-> elfs myscript.py arg0 arg1 arg2
-script output
-# file extension is implied only if unambiguous
-> elfs myscript arg0 arg1 arg2
-script output
-```
-```fish
-# add an extension to run a file with a specific executable
-> elfs -e .py /path/to/alternative/env/for/python
-```
-```fish
-# add a command
-> elfs -cc spam "print spam" "" echo spam
-# run the command
-> elfs spam
-spam
-```
-```fish
-# add a command with replacement
-> elfs -cc "more spam" "even more spam" {} echo spam {} eggs {}
-> elfs "more spam" bacon spam
-spam bacon eggs spam
-```
-```fish
-# command chaining (needs to run in a shell, elfs uses Popen shell=False)
-> elfs -cc "double spam" "" "" bash -c "echo spam && echo spam"
-> elfs "double spam"
-spam spam
-```
-```fish
-# see the command without running it (quotes may appear slightly different)
-> elfs -n "double spam"
-Command: bash -c "echo spam && echo spam"
-```
-```fish
-# list all commands and files
-> elfs -l
-```
-```fish
-# search commands and files with fuzzy matches
-> elfs -s dble spam
-0. bash -c "echo spam && echo spam"
-Enter a number to select and run a match, anything else to cancel
-Supply any extra arguments (if needed) separated by spaces
->>> 
-```
-```fish
-# add a command using your favourite editor to easily edit your config
-> elfs -cc "config" "" "" nano ~/.config/elfs/config.json
-# or add a command to easily edit your spellbook (you can move this file)
-> elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json
-```
-Unless using search (and select), the default behaviour is to find a command using exact matches only, and are selected in the following order of precedence
-1. files in order of directory listed in config
-2. names of commands from spellbook in order listed
-3. imply file extension if unambiguous
+- add a directory  
+```> elfs -d ~/scripts```
+- run your script from any directory  
+```> elfs myscript.py arg0 arg1 arg2```
+- file extension is implied only if unambiguous  
+```> elfs myscript arg0 arg1 arg2```
+- add an extension to run a file with a specific executable  
+```> elfs -e .py /path/to/alternative/env/for/python```
+- add a command  
+```> elfs -cc spam "echo spam to output 3 times" "" echo spam spam spam```
+- run the command  
+```> elfs spam```
+> spam spam spam
+- add a command with a replace-str (metavar: rs) and run it  
+```> elfs -cc menu "even more spam" {} echo spam {} spam {}```  
+```> elfs menu bacon eggs```
+> spam bacon spam eggs
+- giving fewer arguments causes them to repeat  
+```> elfs menu bacon```
+> spam bacon spam bacon
+- and extra arguments are passed along  as normal
+```> elfs menu bacon eggs sausage spam```
+> spam bacon spam eggs sausage spam
+- command chaining (needs to run in a shell, elfs uses Popen shell=False)  
+```> elfs -cc "double spam" "" "" bash -c "echo spam && echo spam"```  
+```> elfs "double spam"```
+> spam spam
+- see the command without running it (quotes may appear slightly different)  
+```> elfs -n "double spam"```
+> Command: bash -c "echo spam && echo spam"
+- list all commands and files  
+```> elfs -l```
+- search commands and files with fuzzy matches, then optionally select from a list of matches to execute  
+```> elfs -s dble spam```
+- add a command to quickly edit your config  
+```> elfs -cc "config" "" "" nano ~/.config/elfs/config.json```
+- or add a command to edit your spellbook (you can move this file)  
+```> elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json```

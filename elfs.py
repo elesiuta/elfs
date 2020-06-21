@@ -34,7 +34,7 @@ import sys
 def setup(long_description: str):
     setuptools.setup(
         name="elfs",
-        version="0.4.6",
+        version="0.4.7",
         description="Easy Launcher For (the) Shell",
         long_description=long_description,
         long_description_content_type="text/markdown",
@@ -285,6 +285,8 @@ def main() -> int:
             print(colourStr(str(i) + ". ", "G"), search_results[i]["label"])
         print("Enter a " + colourStr("number", "G") + " to select and run a match, anything else to cancel")
         print("Supply any extra arguments (if needed) separated by spaces")
+        if not sys.stdin.isatty():
+            print(colourStr("Warning: stdin is not connected to a terminal", "Y"))
         search_input = input(">>> ")
         try:
             search_input = shlex.split(search_input)

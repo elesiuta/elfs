@@ -54,7 +54,7 @@ optional arguments:
 - giving fewer arguments causes them to repeat  
 ```> elfs menu bacon```
 > spam bacon spam bacon
-- and extra arguments are passed along  as normal
+- and extra arguments are passed along as normal  
 ```> elfs menu bacon eggs sausage spam```
 > spam bacon spam eggs sausage spam
 - command chaining (needs to run in a shell, elfs uses Popen shell=False)  

@@ -34,7 +34,7 @@ import sys
 def setup(long_description: str):
     setuptools.setup(
         name="elfs",
-        version="1.0.0",
+        version="1.0.1",
         description="Easy Launcher For (the) Shell",
         long_description=long_description,
         long_description_content_type="text/markdown",
@@ -48,6 +48,29 @@ def setup(long_description: str):
             "Environment :: Console",
         ],
     )
+
+
+def initParser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Easy Launcher For (the) Shell",
+                                     usage="%(prog)s [options] [command [initial-arguments ...]]")
+    parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
+                        help=argparse.SUPPRESS)
+    maingrp = parser.add_mutually_exclusive_group()
+    maingrp.add_argument("-c", dest="add_command", action="store_true",
+                         help="add the command to your spellbook")
+    maingrp.add_argument("-cc", dest="add_command_comments", metavar=("name", "desc", "rs"), nargs=3,
+                         help="add the command to your spellbook with comments")
+    maingrp.add_argument("-d", dest="add_dir", metavar="path",
+                         help="add a directory path to your config")
+    maingrp.add_argument("-e", dest="add_extension", metavar=(".ext", "path"), nargs=2,
+                         help="add an extension and the path to an executable for it")
+    maingrp.add_argument("-l", "--list", dest="list", action="store_true",
+                         help="list entire collection (or specify: cmd, dir, ext, files)")
+    maingrp.add_argument("-s", "--search", dest="search", action="store_true",
+                         help="search entire collection for command")
+    parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
+                        help="print command instead of executing it")
+    return parser
 
 
 def colourStr(string: str, colour: str) -> str:
@@ -100,26 +123,8 @@ def writeJson(file_path: str, data: dict, spellbook: bool = False) -> None:
 
 
 def main() -> int:
-    # argparse
-    parser = argparse.ArgumentParser(description="Easy Launcher For (the) Shell",
-                                     usage="%(prog)s [options] [command [initial-arguments ...]]")
-    parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
-                        help=argparse.SUPPRESS)
-    maingrp = parser.add_mutually_exclusive_group()
-    maingrp.add_argument("-c", dest="add_command", action="store_true",
-                         help="add the command to your spellbook")
-    maingrp.add_argument("-cc", dest="add_command_comments", metavar=("name", "desc", "rs"), nargs=3,
-                         help="add the command to your spellbook with comments")
-    maingrp.add_argument("-d", dest="add_dir", metavar="path",
-                         help="add a directory path to your config")
-    maingrp.add_argument("-e", dest="add_extension", metavar=(".ext", "path"), nargs=2,
-                         help="add an extension and the path to an executable for it")
-    maingrp.add_argument("-l", "--list", dest="list", action="store_true",
-                         help="list entire collection (or specify: cmd, dir, ext, files)")
-    maingrp.add_argument("-s", "--search", dest="search", action="store_true",
-                         help="search entire collection for command")
-    parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
-                        help="print command instead of executing it")
+    # parse arguments
+    parser = initParser()
     args = parser.parse_args()
     # init config
     config_path = os.path.join(os.path.expanduser("~"), ".config", "elfs", "config.json")
@@ -181,11 +186,6 @@ def main() -> int:
             warning_msg += colourStr(" already exists in your collection, only the first entry will run with", "Y")
             print(warning_msg + " elfs " + spell["name"])
         return 0
-    # add extension
-    if args.add_extension:
-        config["executables"][args.add_extension[0]] = args.add_extension[1]
-        writeJson(config_path, config)
-        return 0
     # add dir
     if args.add_dir:
         if not os.path.isdir(args.add_dir):
@@ -193,6 +193,11 @@ def main() -> int:
             return 1
         if os.path.abspath(args.add_dir) not in config["directories"]:
             config["directories"].append(os.path.abspath(args.add_dir))
+        writeJson(config_path, config)
+        return 0
+    # add extension
+    if args.add_extension:
+        config["executables"][args.add_extension[0]] = args.add_extension[1]
         writeJson(config_path, config)
         return 0
     # list collection

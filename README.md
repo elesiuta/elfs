@@ -1,4 +1,4 @@
-# Easy Launcher For the Shell (temporary name)
+# Easy Launcher For the Shell
 ### Install from PyPI
 ```
 pip install elfs

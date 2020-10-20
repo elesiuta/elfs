@@ -99,7 +99,7 @@ def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx:
         sys.argv = ["elfs", "--_return_completion", line]
         completions = main()
         if len(completions) >= 1:
-            return {completion.split("\t")[0] for completion in completions}
+            return {completion.split("\t")[0] for completion in completions if completion.startswith(prefix)}
     return None
 
 

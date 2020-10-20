@@ -177,10 +177,7 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
                     start = source.index("# ELFS TAB-COMPLETION START") + len("# ELFS TAB-COMPLETION START")
                     end = source.index("# ELFS TAB-COMPLETION END")
                     completion_rules = json.loads(source[start:end])
-            except Exception as e:
-                # print(traceback.format_exc())
-                # line = str(sys.exc_info()[2].tb_lineno)
-                # completions += [type(e).__name__ + "\t" + str(e.args)]
+            except Exception:
                 pass
         for rule in completion_rules:
             if eval(rule["expression"], completion_namespace, completion_namespace):

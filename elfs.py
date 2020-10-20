@@ -96,12 +96,23 @@ def colourStr(string: str, colour: str) -> str:
 
 def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx: dict) -> typing.Union[None, set]:
     if line.startswith("elfs "):
+        # get regular completions
         sys.argv = ["elfs", "--_return_completion", line]
         completions = main()
-        if not os.path.dirname(prefix):
-            completions += os.listdir()
-        elif os.path.isdir(os.path.dirname(prefix)):
+        # xonsh only seems to autocomplete paths with quotes
+        # this also autocompletes simple file paths (without quotes, only works on paths without spaces)
+        # xonsh splits off the prefix on space (even when escaped), so .replace("\\ ", " ") does not work
+        # try:
+        #     path_prefix = shlex.split(line)[-1]
+        # except Exception:
+        #     path_prefix = shlex.split(shlex.quote(line))[-1]
+        if os.path.isdir(os.path.dirname(prefix)):
+            # prefix = path_prefix.replace("\"'", "")
             completions += os.listdir(os.path.dirname(prefix))
+        else:
+            completions += os.listdir()
+        # format completions for xonsh -remove descriptions -escape spaces -filter by prefix
+        # bug where it filters out files and commands after the space (don't want to deal with look backs to see if previous is complete)
         if len(completions) >= 1:
             return {completion.split("\t")[0].replace(" ", "\\ ") for completion in completions if completion.startswith(prefix)}
     return None
@@ -272,7 +283,10 @@ def main() -> typing.Union[int, list]:
     # print completions
     if args.print_completions:
         last_char = args.print_completions[-1]
-        command = shlex.split(args.print_completions)
+        try:
+            command = shlex.split(args.print_completions)
+        except Exception:
+            command = shlex.split(shlex.quote(args.print_completions))
         completions = getCompletions(command, last_char, file_dict, spellbook_dict)
         if completions:
             print("\n".join(completions))
@@ -280,7 +294,10 @@ def main() -> typing.Union[int, list]:
     # return completions
     if args.return_completions:
         last_char = args.return_completions[-1]
-        command = shlex.split(args.return_completions)
+        try:
+            command = shlex.split(args.return_completions)
+        except Exception:
+            command = shlex.split(shlex.quote(args.return_completions))
         completions = getCompletions(command, last_char, file_dict, spellbook_dict)
         return completions
     # register fish completions

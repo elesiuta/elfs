@@ -83,15 +83,15 @@ optional arguments:
 [
   {
     "expression": "python_expression_for_rule_1",
-    "completions": ["option1", "option2", "option3"]
+    "completions": ["option1", "option2\thello", "option3\tworld"]
   },
   {
     "expression": "python_expression_for_rule_2",
-    "completions": ["option1", "option4"]
+    "completions": ["option1", "option4\toptional description"]
   }
 ]
 ```
-- where the python expression is evalued in a namespace with the following variables
+- where the python expression is evaluated in a namespace with the following variables
   - position = current position in the command, where 0 is the current script
     - eg. `elfs[None] myscript.py[0] option[1] [2]`
     - position does not increment until the next space `elfs[None] myscript.py[0] option[1] op[2]`

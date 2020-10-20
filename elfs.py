@@ -98,8 +98,12 @@ def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx:
     if line.startswith("elfs "):
         sys.argv = ["elfs", "--_return_completion", line]
         completions = main()
+        if not os.path.dirname(prefix):
+            completions += os.listdir()
+        elif os.path.isdir(os.path.dirname(prefix)):
+            completions += os.listdir(os.path.dirname(prefix))
         if len(completions) >= 1:
-            return {completion.split("\t")[0] for completion in completions if completion.startswith(prefix)}
+            return {completion.split("\t")[0].replace(" ", "\\ ") for completion in completions if completion.startswith(prefix)}
     return None
 
 

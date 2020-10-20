@@ -173,9 +173,9 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
                 source = ""
                 with open(os.path.join(file_dict[file_name], file_name), "r") as f:
                     source = f.read()
-                if "# ELFS TAB-COMPLETION START" in source and "# ELFS TAB-COMPLETION END" in source:
-                    start = source.index("# ELFS TAB-COMPLETION START") + len("# ELFS TAB-COMPLETION START")
-                    end = source.index("# ELFS TAB-COMPLETION END")
+                if "# TAB-COMPLETION START" in source and "# TAB-COMPLETION END" in source:
+                    start = source.index("# TAB-COMPLETION START") + len("# TAB-COMPLETION START")
+                    end = source.index("# TAB-COMPLETION END")
                     completion_rules = json.loads(source[start:end])
             except Exception as e:
                 print("\nError elfs line: %s %s %s" % (sys.exc_info()[2].tb_lineno, type(e).__name__, e.args), file=sys.stderr)

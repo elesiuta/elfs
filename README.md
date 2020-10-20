@@ -83,7 +83,7 @@ optional arguments:
 [
   {
     "expression": "python_expression_for_rule_1",
-    "completions": ["option1", "option2", option3"]
+    "completions": ["option1", "option2", "option3"]
   },
   {
     "expression": "python_expression_for_rule_2",
@@ -100,11 +100,11 @@ optional arguments:
     - and `command=["myscript.py", "option", "op"]`
 - the completion rules can be placed in either of the following locations
   - inside `file_name.ext.elfs.json`, eg. `myscript.py.elfs.json`
-  - or directly enclosed in `file_name.ext` with `# ELFS TAB-COMPLETION START` and `# ELFS TAB-COMPLETION END`
+  - or directly enclosed in `file_name.ext` with `# TAB-COMPLETION START` and `# TAB-COMPLETION END`
 ```python
-# ELFS TAB-COMPLETION START
+# TAB-COMPLETION START
 [
   ...
 ]
-# ELFS TAB-COMPLETION END
+# TAB-COMPLETION END
 ```

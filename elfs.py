@@ -29,6 +29,7 @@ import setuptools
 import shlex
 import subprocess
 import sys
+import typing
 
 
 def setup(long_description: str):
@@ -68,6 +69,14 @@ def initParser() -> argparse.ArgumentParser:
                          help="list entire collection (or specify: cmd, dir, ext, files)")
     maingrp.add_argument("-s", "--search", dest="search", action="store_true",
                          help="search entire collection for command")
+    maingrp.add_argument("--_completion", dest="print_completions", type=str,
+                         help=argparse.SUPPRESS)
+    maingrp.add_argument("--_return_completion", dest="return_completions", type=str,
+                         help=argparse.SUPPRESS)
+    maingrp.add_argument("--reg-fish", dest="reg_fish_completer", action="store_true",
+                         help=argparse.SUPPRESS)
+    maingrp.add_argument("--reg-xonsh", dest="reg_xonsh_completer", action="store_true",
+                         help=argparse.SUPPRESS)
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
                         help="print command instead of executing it")
     return parser
@@ -82,6 +91,50 @@ def colourStr(string: str, colour: str) -> str:
         "V": "\033[95m"
     }
     return colours[colour] + string + "\033[0m"
+
+
+def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx: dict) -> typing.Union[None, set]:
+    if line.startswith("elfs "):
+        sys.argv = ["elfs", "--_return_completion", line]
+        completions = main()
+        if len(completions) >= 1:
+            return {completion.split("\t")[0] for completion in completions}
+    return None
+
+
+def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dict: dict) -> list:
+    position = len(command)
+    if last_char == " ":
+        position += 1
+    completions = []
+    if position <= 2 or command[1] in ["-n", "--dry-run", "-s", "--search"]:
+        completions += [
+            "-h\thelp",
+            "-c\tadd command",
+            "-cc\tadd name desc rs command",
+            "-d\tadd directory",
+            "-e\tadd extension",
+            "-l\tlist",
+            "-s\tsearch",
+            "-n\tdry-run",
+        ]
+        completions += [file_name for file_name in file_dict.keys()]
+        completions += [spell_name + "\t" + spellbook_dict[spell_name]["desc"][:16] for spell_name in spellbook_dict.keys()]
+    elif position == 3 and command[1] in ["-l", "--list"]:
+        completions += [
+            "cmd",
+            "dir",
+            "ext",
+            "files"
+        ]
+    if position == 2 and len(command) >= 2 and command[1].startswith("--"):
+        completions += [
+            "--help\thelp",
+            "--list\tlist",
+            "--search\tsearch",
+            "--dry-run\tdry-run",
+        ]
+    return completions
 
 
 def readJson(file_path: str) -> dict:
@@ -122,7 +175,7 @@ def writeJson(file_path: str, data: dict, spellbook: bool = False) -> None:
             json_file.write(normal_json)
 
 
-def main() -> int:
+def main() -> typing.Union[int, list]:
     # parse arguments
     parser = initParser()
     args = parser.parse_args()
@@ -160,6 +213,48 @@ def main() -> int:
     for spell in spellbook["spells"]:
         if spell["name"] not in spellbook_dict:
             spellbook_dict[spell["name"]] = spell
+    # print completions
+    if args.print_completions:
+        last_char = args.print_completions[-1]
+        command = shlex.split(args.print_completions)
+        completions = getCompletions(command, last_char, file_dict, spellbook_dict)
+        if completions:
+            print("\n".join(completions))
+        return 0
+    # return completions
+    if args.return_completions:
+        last_char = args.return_completions[-1]
+        command = shlex.split(args.return_completions)
+        completions = getCompletions(command, last_char, file_dict, spellbook_dict)
+        return completions
+    # register fish completions (use -e to unregister)
+    if args.reg_fish_completer:
+        prog = parser.prog
+        with open(os.path.expanduser("~/.config/fish/config.fish"), "a+") as f:
+            f.seek(0)
+            if "ELFS TAB-COMPLETION" not in f.read():
+                fishrc = [
+                    "\n# ELFS TAB-COMPLETION START",
+                    "\ncomplete -c %s -a '(%s --_completion (commandline -cp))'" % (prog, prog),
+                    "\n# ELFS TAB-COMPLETION END",
+                    "\n\n"
+                ]
+                f.writelines(fishrc)
+        return 0
+    # register xonsh completions
+    if args.reg_xonsh_completer:
+        with open(os.path.expanduser("~/.xonshrc"), "a+") as f:
+            f.seek(0)
+            if "ELFS TAB-COMPLETION" not in f.read():
+                xonshrc = [
+                    "\n# ELFS TAB-COMPLETION START",
+                    "\nfrom elfs import elfsXompletionWrapper",
+                    "\ncompleter add elfs elfsXompletionWrapper",
+                    "\n# ELFS TAB-COMPLETION END",
+                    "\n\n"
+                ]
+                f.writelines(xonshrc)
+        return 0
     # add command
     if args.add_command:
         spell = {

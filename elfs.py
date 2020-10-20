@@ -24,6 +24,7 @@ import argparse
 import collections
 import difflib
 import json
+import mimetypes
 import os
 import setuptools
 import shlex
@@ -106,7 +107,7 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
     # get position of current argument, where position 0 is "elfs"
     position = len(command) - 1
     if last_char == " ":
-        # on the next argument, append empty string to simplify checks and prevent IndexError
+        # append empty string for the current (empty) argument for consistent indexing
         position += 1
         command.append("")
     # start off without any completions and append
@@ -133,20 +134,51 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
         completions += ["-n\tdry-run"]
         if command[1].startswith("--"):
             completions += ["--dry-run\tdry-run"]
-    if (position == 2 and command[1] in ["-l", "--list"]) or (position == 3 and command[2] in ["-l", "--list"]):
+    if position <= 3 and command[position - 1] in ["-l", "--list"]:
         completions += [
             "cmd",
             "dir",
             "ext",
             "files"
         ]
+    # add files and commands from spellbook to completions
     if (
         (position == 1) or
-        (position == 2 and command[1] in ["-n", "--dry-run", "-s", "--search"]) or
-        (position == 3 and command[2] in ["-n", "--dry-run", "-s", "--search"])
+        (position <= 3 and command[position - 1] in ["-n", "--dry-run", "-s", "--search"])
     ):
         completions += [file_name for file_name in file_dict.keys()]
         completions += [spell_name + "\t" + spellbook_dict[spell_name]["desc"][:16] for spell_name in spellbook_dict.keys()]
+    # extend with completions from target file
+    if (
+        (position >= 2 and command[1] in file_dict) or
+        (position >= 3 and command[1] in ["-n", "--dry-run"] and command[2] in file_dict)
+    ):
+        new_position = position - 1
+        new_command = command[1:]
+        if command[1] in ["-n", "--dry-run"]:
+            new_position = position - 2
+            new_position = command[2:]
+        file_name = new_command[0]
+        completion_namespace = {
+            "position": new_position,
+            "command": new_command,
+            "pos": new_position,
+            "cmd": new_command
+        }
+        completion_rules = []
+        if os.path.isfile(os.path.join(file_dict[file_name], file_name + ".elfs.json")):
+            completion_rules = readJson(os.path.join(file_dict[file_name], file_name + ".elfs.json"))
+        elif str(mimetypes.guess_type(file_name)[0]).startswith("text"):
+            source = ""
+            with open(os.path.join(file_dict[file_name], file_name), "r") as f:
+                source = f.read()
+            if "# ELFS TAB-COMPLETION START" in source and "# ELFS TAB-COMPLETION END" in source:
+                start = source.index("# ELFS TAB-COMPLETION START") + 1
+                end = source.index("# ELFS TAB-COMPLETION END")
+                completion_rules = json.loads(source[start:end])
+        for rule in completion_rules:
+            if eval(rule["expression"], completion_namespace, completion_namespace):
+                completions += rule["completions"]
     return completions
 
 

@@ -7,6 +7,11 @@ pip install elfs
 ```
 python setup.py install --user
 ```
+### Enable dynamic tab-completion for fish or xonsh
+```
+elfs --reg-fish
+elfs --reg-xonsh
+```
 ### Command Line Interface
 ```
 usage: elfs [options] [command [initial-arguments ...]]
@@ -72,3 +77,34 @@ optional arguments:
 ```> elfs -cc "config" "" "" nano ~/.config/elfs/config.json```
 - or add a command to edit your spellbook (you can move this file)  
 ```> elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json```
+### Add dynamic tab-completion to your scripts
+- create completion rules in following json format
+```json
+[
+  {
+    "expression": "python_expression_for_rule_1",
+    "completions": ["option1", "option2", option3"]
+  },
+  {
+    "expression": "python_expression_for_rule_2",
+    "completions": ["option1", "option4"]
+  }
+]
+```
+- where the python expression is evalued in a namespace with the following variables
+  - position = current position in the command, where 0 is the current script
+    - eg. `elfs[None] myscript.py[0] option[1] [2]`
+    - position does not increment until the next space `elfs[None] myscript.py[0] option[1] op[2]`
+  - command = command so far, as parsed by shlex
+    - following the same example with `position=2`, `command=["myscript.py", "option", ""]`
+    - and `command=["myscript.py", "option", "op"]`
+- the completion rules can be placed in either of the following locations
+  - inside `file_name.ext.elfs.json`, eg. `myscript.py.elfs.json`
+  - or directly enclosed in `file_name.ext` with `# ELFS TAB-COMPLETION START` and `# ELFS TAB-COMPLETION END`
+```python
+# ELFS TAB-COMPLETION START
+[
+  ...
+]
+# ELFS TAB-COMPLETION END
+```

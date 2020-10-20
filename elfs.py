@@ -169,13 +169,19 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
         if os.path.isfile(os.path.join(file_dict[file_name], file_name + ".elfs.json")):
             completion_rules = readJson(os.path.join(file_dict[file_name], file_name + ".elfs.json"))
         elif str(mimetypes.guess_type(file_name)[0]).startswith("text"):
-            source = ""
-            with open(os.path.join(file_dict[file_name], file_name), "r") as f:
-                source = f.read()
-            if "# ELFS TAB-COMPLETION START" in source and "# ELFS TAB-COMPLETION END" in source:
-                start = source.index("# ELFS TAB-COMPLETION START") + 1
-                end = source.index("# ELFS TAB-COMPLETION END")
-                completion_rules = json.loads(source[start:end])
+            try:
+                source = ""
+                with open(os.path.join(file_dict[file_name], file_name), "r") as f:
+                    source = f.read()
+                if "# ELFS TAB-COMPLETION START" in source and "# ELFS TAB-COMPLETION END" in source:
+                    start = source.index("# ELFS TAB-COMPLETION START") + len("# ELFS TAB-COMPLETION START")
+                    end = source.index("# ELFS TAB-COMPLETION END")
+                    completion_rules = json.loads(source[start:end])
+            except Exception as e:
+                # print(traceback.format_exc())
+                # line = str(sys.exc_info()[2].tb_lineno)
+                # completions += [type(e).__name__ + "\t" + str(e.args)]
+                pass
         for rule in completion_rules:
             if eval(rule["expression"], completion_namespace, completion_namespace):
                 completions += rule["completions"]

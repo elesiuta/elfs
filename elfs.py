@@ -99,20 +99,14 @@ def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx:
         # get regular completions
         sys.argv = ["elfs", "--_return_completion", line]
         completions = main()
-        # xonsh only seems to autocomplete paths with quotes
-        # this also autocompletes simple file paths (without quotes, only works on paths without spaces)
-        # xonsh splits off the prefix on space (even when escaped), so .replace("\\ ", " ") does not work
-        # try:
-        #     path_prefix = shlex.split(line)[-1]
-        # except Exception:
-        #     path_prefix = shlex.split(shlex.quote(line))[-1]
+        # xonsh seems to need quotes to autocomplete paths, and splits off prefix on a space (even when escaped)
+        # this slightly improves it for paths without spaces (without needing quotes)
+        # trying anything more, eg. with shlex is problematic
         if os.path.isdir(os.path.dirname(prefix)):
-            # prefix = path_prefix.replace("\"'", "")
             completions += os.listdir(os.path.dirname(prefix))
         else:
             completions += os.listdir()
         # format completions for xonsh -remove descriptions -escape spaces -filter by prefix
-        # bug where it filters out files and commands after the space (don't want to deal with look backs to see if previous is complete)
         if len(completions) >= 1:
             return {completion.split("\t")[0].replace(" ", "\\ ") for completion in completions if completion.startswith(prefix)}
     return None

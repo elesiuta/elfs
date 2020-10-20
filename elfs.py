@@ -103,37 +103,50 @@ def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx:
 
 
 def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dict: dict) -> list:
-    position = len(command)
+    # get position of current argument, where position 0 is "elfs"
+    position = len(command) - 1
     if last_char == " ":
+        # on the next argument, append empty string to simplify checks and prevent IndexError
         position += 1
+        command.append("")
+    # start off without any completions and append
     completions = []
-    if position <= 2 or command[1] in ["-n", "--dry-run", "-s", "--search"]:
+    if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run", "-s", "--search"]):
         completions += [
             "-h\thelp",
             "-c\tadd command",
             "-cc\tadd name desc rs command",
             "-d\tadd directory",
             "-e\tadd extension",
-            "-l\tlist",
-            "-s\tsearch",
-            "-n\tdry-run",
+            "-l\tlist"
         ]
-        completions += [file_name for file_name in file_dict.keys()]
-        completions += [spell_name + "\t" + spellbook_dict[spell_name]["desc"][:16] for spell_name in spellbook_dict.keys()]
-    elif position == 3 and command[1] in ["-l", "--list"]:
+        if command[1].startswith("--"):
+            completions += [
+                "--help\thelp",
+                "--list\tlist"
+            ]
+    if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run"]):
+        completions += ["-s\tsearch"]
+        if command[1].startswith("--"):
+            completions += ["--search\tsearch"]
+    if (position == 1) or (position == 2 and command[1] in ["-s", "--search"]):
+        completions += ["-n\tdry-run"]
+        if command[1].startswith("--"):
+            completions += ["--dry-run\tdry-run"]
+    if (position == 2 and command[1] in ["-l", "--list"]) or (position == 3 and command[2] in ["-l", "--list"]):
         completions += [
             "cmd",
             "dir",
             "ext",
             "files"
         ]
-    if position == 2 and len(command) >= 2 and command[1].startswith("--"):
-        completions += [
-            "--help\thelp",
-            "--list\tlist",
-            "--search\tsearch",
-            "--dry-run\tdry-run",
-        ]
+    if (
+        (position == 1) or
+        (position == 2 and command[1] in ["-n", "--dry-run", "-s", "--search"]) or
+        (position == 3 and command[2] in ["-n", "--dry-run", "-s", "--search"])
+    ):
+        completions += [file_name for file_name in file_dict.keys()]
+        completions += [spell_name + "\t" + spellbook_dict[spell_name]["desc"][:16] for spell_name in spellbook_dict.keys()]
     return completions
 
 
@@ -197,14 +210,15 @@ def main() -> typing.Union[int, list]:
     for directory in config["directories"]:
         for file_name in sorted(os.listdir(directory)):
             if os.path.isfile(os.path.join(directory, file_name)):
-                if file_name not in file_dict:
-                    file_dict[file_name] = directory
-                else:
-                    file_extra.append(os.path.join(directory, file_name))
-                if os.path.splitext(file_name)[0] not in file_splitext:
-                    file_splitext[os.path.splitext(file_name)[0]] = os.path.splitext(file_name)[1]
-                else:
-                    file_splitext[os.path.splitext(file_name)[0]] = False
+                if file_name[-10:] != ".elfs.json":
+                    if file_name not in file_dict:
+                        file_dict[file_name] = directory
+                    else:
+                        file_extra.append(os.path.join(directory, file_name))
+                    if os.path.splitext(file_name)[0] not in file_splitext:
+                        file_splitext[os.path.splitext(file_name)[0]] = os.path.splitext(file_name)[1]
+                    else:
+                        file_splitext[os.path.splitext(file_name)[0]] = False
     # init spellbook
     spellbook = readJson(config["spellbook"])
     if not spellbook:
@@ -227,15 +241,14 @@ def main() -> typing.Union[int, list]:
         command = shlex.split(args.return_completions)
         completions = getCompletions(command, last_char, file_dict, spellbook_dict)
         return completions
-    # register fish completions (use -e to unregister)
+    # register fish completions
     if args.reg_fish_completer:
-        prog = parser.prog
         with open(os.path.expanduser("~/.config/fish/config.fish"), "a+") as f:
             f.seek(0)
             if "ELFS TAB-COMPLETION" not in f.read():
                 fishrc = [
                     "\n# ELFS TAB-COMPLETION START",
-                    "\ncomplete -c %s -a '(%s --_completion (commandline -cp))'" % (prog, prog),
+                    "\ncomplete -c elfs -a '(elfs --_completion (commandline -cp))'",
                     "\n# ELFS TAB-COMPLETION END",
                     "\n\n"
                 ]

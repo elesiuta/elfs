@@ -1,4 +1,4 @@
-# Easy Launcher For the Shell
+# Enhanced aLiases For Scripts (Name subject to change)
 ### Install from PyPI
 ```
 pip install elfs

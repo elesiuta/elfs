@@ -78,7 +78,7 @@ optional arguments:
 - or add a command to edit your spellbook (you can move this file)  
 ```> elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json```
 ### Add dynamic tab-completion to your scripts
-- create completion rules in following json format
+- create completion rules in the following json format
 ```json
 [
   {
@@ -98,6 +98,7 @@ optional arguments:
   - command = command so far, as parsed by shlex
     - following the same example with `position=2`, `command=["myscript.py", "option", ""]`
     - and `command=["myscript.py", "option", "op"]`
+  - eg. `"position == 2 and command[1] in ['option1', 'option2']"`
 - the completion rules can be placed in either of the following locations
   - inside `file_name.ext.elfs.json`, eg. `myscript.py.elfs.json`
   - or directly enclosed in `file_name.ext` with `# TAB-COMPLETION START` and `# TAB-COMPLETION END`

@@ -122,24 +122,22 @@ def getCompletions(command: list, command_str: str, last_char: str, file_dict: d
         command.append("")
     # start off without any completions and append
     completions = []
-    if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run", "-s", "--search"]):
+    if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run"]):
         completions += [
             "-h\thelp",
             "-c\tadd command",
             "-cc\tadd name desc rs command",
             "-d\tadd directory",
             "-e\tadd extension",
-            "-l\tlist"
+            "-l\tlist",
+            "-s\tsearch"
         ]
         if command[position].startswith("--"):
             completions += [
                 "--help\thelp",
-                "--list\tlist"
+                "--list\tlist",
+                "--search\tsearch"
             ]
-    if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run"]):
-        completions += ["-s\tsearch"]
-        if command[position].startswith("--"):
-            completions += ["--search\tsearch"]
     if (position == 1) or (position == 2 and command[1] in ["-s", "--search"]):
         completions += ["-n\tdry-run"]
         if command[position].startswith("--"):

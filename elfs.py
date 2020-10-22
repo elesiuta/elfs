@@ -79,6 +79,8 @@ def initParser() -> argparse.ArgumentParser:
                          help=argparse.SUPPRESS)
     maingrp.add_argument("--reg-xonsh", dest="reg_xonsh_completer", action="store_true",
                          help=argparse.SUPPRESS)
+    maingrp.add_argument("--reg-zsh", dest="reg_zsh_completer", action="store_true",
+                         help=argparse.SUPPRESS)
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
                         help="print command instead of executing it")
     return parser
@@ -325,6 +327,10 @@ def main() -> typing.Union[int, list]:
                     "\n\n"
                 ]
                 f.writelines(xonshrc)
+        return 0
+    # register zsh completions
+    if args.reg_zsh_completer:
+        print("TODO")
         return 0
     # add command
     if args.add_command:

@@ -131,18 +131,18 @@ def getCompletions(command: list, command_str: str, last_char: str, file_dict: d
             "-e\tadd extension",
             "-l\tlist"
         ]
-        if command[1].startswith("--"):
+        if command[position].startswith("--"):
             completions += [
                 "--help\thelp",
                 "--list\tlist"
             ]
     if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run"]):
         completions += ["-s\tsearch"]
-        if command[1].startswith("--"):
+        if command[position].startswith("--"):
             completions += ["--search\tsearch"]
     if (position == 1) or (position == 2 and command[1] in ["-s", "--search"]):
         completions += ["-n\tdry-run"]
-        if command[1].startswith("--"):
+        if command[position].startswith("--"):
             completions += ["--dry-run\tdry-run"]
     if position <= 3 and command[position - 1] in ["-l", "--list"]:
         completions += [

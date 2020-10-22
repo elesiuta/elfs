@@ -112,7 +112,7 @@ def elfsXompletionWrapper(prefix: str, line: str, begidx: int, endidx: int, ctx:
     return None
 
 
-def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dict: dict) -> list:
+def getCompletions(command: list, command_str: str, last_char: str, file_dict: dict, spellbook_dict: dict) -> list:
     # get position of current argument, where position 0 is "elfs"
     position = len(command) - 1
     if last_char == " ":
@@ -190,7 +190,12 @@ def getCompletions(command: list, last_char: str, file_dict: dict, spellbook_dic
                 print("\nError elfs line: %s %s %s" % (sys.exc_info()[2].tb_lineno, type(e).__name__, e.args), file=sys.stderr)
         for rule in completion_rules:
             try:
-                if eval(rule["expression"], completion_namespace, completion_namespace):
+                if "command" in rule:
+                    completer_command = [arg.replace("(commandline)", command_str) for arg in rule["command"]]
+                    completer_process = subprocess.run(completer_command, cwd=file_dict[file_name], stdout=subprocess.PIPE, universal_newlines=True)
+                    for completion in completer_process.stdout.splitlines():
+                        completions.append(completion)
+                elif eval(rule["expression"], completion_namespace, completion_namespace):
                     completions += rule["completions"]
             except Exception as e:
                 print("\nError elfs line: %s %s %s" % (sys.exc_info()[2].tb_lineno, type(e).__name__, e.args), file=sys.stderr)
@@ -276,23 +281,23 @@ def main() -> typing.Union[int, list]:
             spellbook_dict[spell["name"]] = spell
     # print completions
     if args.print_completions:
-        last_char = args.print_completions[-1]
+        command_str, last_char = args.print_completions, args.print_completions[-1]
         try:
             command = shlex.split(args.print_completions)
         except Exception:
             command = shlex.split(shlex.quote(args.print_completions))
-        completions = getCompletions(command, last_char, file_dict, spellbook_dict)
+        completions = getCompletions(command, command_str, last_char, file_dict, spellbook_dict)
         if completions:
             print("\n".join(completions))
         return 0
     # return completions
     if args.return_completions:
-        last_char = args.return_completions[-1]
+        command_str, last_char = args.return_completions, args.return_completions[-1]
         try:
             command = shlex.split(args.return_completions)
         except Exception:
             command = shlex.split(shlex.quote(args.return_completions))
-        completions = getCompletions(command, last_char, file_dict, spellbook_dict)
+        completions = getCompletions(command, command_str, last_char, file_dict, spellbook_dict)
         return completions
     # register fish completions
     if args.reg_fish_completer:

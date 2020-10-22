@@ -26,6 +26,7 @@ import difflib
 import json
 import mimetypes
 import os
+import re
 import setuptools
 import shlex
 import subprocess
@@ -191,7 +192,8 @@ def getCompletions(command: list, command_str: str, last_char: str, file_dict: d
         for rule in completion_rules:
             try:
                 if "command" in rule:
-                    completer_command = [arg.replace("(commandline)", command_str) for arg in rule["command"]]
+                    command_str_stripped = re.sub("^%s +(-n +|--dry-run +)?" % (command[0]), "", command_str, count=1)
+                    completer_command = [arg.replace("(commandline)", command_str_stripped) for arg in rule["command"]]
                     completer_process = subprocess.run(completer_command, cwd=file_dict[file_name], stdout=subprocess.PIPE, universal_newlines=True)
                     for completion in completer_process.stdout.splitlines():
                         completions.append(completion)

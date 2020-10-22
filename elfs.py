@@ -167,7 +167,7 @@ def getCompletions(command: list, command_str: str, last_char: str, file_dict: d
         new_command = command[1:]
         if command[1] in ["-n", "--dry-run"]:
             new_position = position - 2
-            new_position = command[2:]
+            new_command = command[2:]
         file_name = new_command[0]
         completion_namespace = {
             "position": new_position,

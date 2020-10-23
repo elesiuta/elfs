@@ -1,4 +1,4 @@
-# Enhanced aLiases For Scripts (Name subject to change)
+# Enhanced aLiases For Shells (Name subject to change)
 ### Install from PyPI
 ```
 pip install elfs
@@ -16,7 +16,7 @@ elfs --reg-xonsh
 ```
 usage: elfs [options] [command [initial-arguments ...]]
 
-Easy Launcher For (the) Shell
+Enhanced aLiases For Shells
 
 optional arguments:
   -h, --help        show this help message and exit

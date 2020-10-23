@@ -37,8 +37,8 @@ import typing
 def setup(long_description: str):
     setuptools.setup(
         name="elfs",
-        version="1.1.1",
-        description="Easy Launcher For (the) Shell",
+        version="1.2.0",
+        description="Enhanced aLiases For Shells",
         long_description=long_description,
         long_description_content_type="text/markdown",
         url="https://github.com/elesiuta/elfs",
@@ -54,7 +54,7 @@ def setup(long_description: str):
 
 
 def initParser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Easy Launcher For (the) Shell",
+    parser = argparse.ArgumentParser(description="Enhanced aLiases For Shells",
                                      usage="%(prog)s [options] [command [initial-arguments ...]]")
     parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)

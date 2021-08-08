@@ -32,7 +32,7 @@ import subprocess
 import sys
 import typing
 
-VERSION = "1.3.2"
+VERSION = "1.3.4"
 
 
 def initParser() -> argparse.ArgumentParser:
@@ -470,13 +470,14 @@ def main() -> typing.Union[int, list]:
             for i in range(len(command)):
                 while spell["replace-str"] in command[i]:
                     j = min(j + 1, len(forward_args) - 1)
-                    command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
                     if spell["replace-str"] in forward_args[j]:
                         if command[i].count(spell["replace-str"]) > 1:
                             print(colourStr("Indeterminate replace-str in arg: ", "R") + command[i])
                             return 1
                         else:
+                            command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
                             break
+                    command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
         command += forward_args[j+1:]
     # execute command
     if args.dry_run:

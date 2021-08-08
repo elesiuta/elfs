@@ -32,7 +32,7 @@ import subprocess
 import sys
 import typing
 
-VERSION = "1.2.1"
+VERSION = "1.3.0"
 
 
 def initParser() -> argparse.ArgumentParser:

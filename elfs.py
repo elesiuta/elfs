@@ -32,7 +32,7 @@ import subprocess
 import sys
 import typing
 
-VERSION = "1.3.0"
+VERSION = "1.3.2"
 
 
 def initParser() -> argparse.ArgumentParser:
@@ -41,7 +41,7 @@ def initParser() -> argparse.ArgumentParser:
     parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
     maingrp = parser.add_mutually_exclusive_group()
-    maingrp.add_argument("-c", dest="add_c", metavar="name",
+    maingrp.add_argument("-c", dest="add_c", metavar="name", type=str,
                          help="add the command to your spellbook")
     maingrp.add_argument("-cc", dest="add_cc", metavar=("name", "desc"), nargs=2,
                          help="also add description with command")
@@ -321,7 +321,7 @@ def main() -> typing.Union[int, list]:
     # add command
     if args.add_c or args.add_cc or args.add_ccc:
         if args.add_c:
-            name, description, replace_str = args.add_c[0], "", ""
+            name, description, replace_str = args.add_c, "", ""
         elif args.add_cc:
             name, description, replace_str = args.add_cc[0], args.add_cc[1], ""
         elif args.add_ccc:
@@ -336,7 +336,7 @@ def main() -> typing.Union[int, list]:
         writeJson(config["spellbook"], spellbook, True)
         if spell["name"] and (spell["name"] in spellbook_dict or spell["name"] in file_dict):
             warning_msg = colourStr("Warning: ", "Y") + spell["name"]
-            warning_msg += colourStr(" already exists in your collection, only the first entry will run with", "Y")
+            warning_msg += colourStr(" already exists in your spellbook, only the first entry will run with", "Y")
             print(warning_msg + " elfs " + spell["name"])
         return 0
     # add dir

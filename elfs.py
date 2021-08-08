@@ -27,34 +27,16 @@ import json
 import mimetypes
 import os
 import re
-import setuptools
 import shlex
 import subprocess
 import sys
 import typing
 
-
-def setup(long_description: str):
-    setuptools.setup(
-        name="elfs",
-        version="1.2.0",
-        description="Enhanced aLiases For Shells",
-        long_description=long_description,
-        long_description_content_type="text/markdown",
-        url="https://github.com/elesiuta/elfs",
-        py_modules=["elfs"],
-        entry_points={"console_scripts": ["elfs = elfs:main"]},
-        classifiers=[
-            "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: MIT License",
-            "Operating System :: OS Independent",
-            "Environment :: Console",
-        ],
-    )
+VERSION = "1.2.1"
 
 
 def initParser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Enhanced aLiases For Shells",
+    parser = argparse.ArgumentParser(description="Almost, but not quite, entirely unlike aliases",
                                      usage="%(prog)s [options] [command [initial-arguments ...]]")
     parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
@@ -83,6 +65,7 @@ def initParser() -> argparse.ArgumentParser:
                          help=argparse.SUPPRESS)
     parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
                         help="print command instead of executing it")
+    parser.add_argument("--version", action="version", version=VERSION)
     return parser
 
 

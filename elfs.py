@@ -470,6 +470,12 @@ def main() -> typing.Union[int, list]:
                 while spell["replace-str"] in command[i]:
                     j = min(j + 1, len(forward_args) - 1)
                     command[i] = command[i].replace(spell["replace-str"], forward_args[j], 1)
+                    if spell["replace-str"] in forward_args[j]:
+                        if command[i].count(spell["replace-str"]) > 1:
+                            print(colourStr("Indeterminate replace-str in arg: ", "R") + command[i])
+                            return 1
+                        else:
+                            break
         command += forward_args[j+1:]
     # execute command
     if args.dry_run:

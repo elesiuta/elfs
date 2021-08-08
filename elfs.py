@@ -41,10 +41,12 @@ def initParser() -> argparse.ArgumentParser:
     parser.add_argument("command", action="store", nargs=argparse.REMAINDER,
                         help=argparse.SUPPRESS)
     maingrp = parser.add_mutually_exclusive_group()
-    maingrp.add_argument("-c", dest="add_command", action="store_true",
+    maingrp.add_argument("-c", dest="add_c", metavar="name",
                          help="add the command to your spellbook")
-    maingrp.add_argument("-cc", dest="add_command_comments", metavar=("name", "desc", "rs"), nargs=3,
-                         help="add the command to your spellbook with comments")
+    maingrp.add_argument("-cc", dest="add_cc", metavar=("name", "desc"), nargs=2,
+                         help="also add description with command")
+    maingrp.add_argument("-ccc", dest="add_ccc", metavar=("name", "desc", "rs"), nargs=3,
+                         help="also add replace-str with command")
     maingrp.add_argument("-d", dest="add_dir", metavar="path",
                          help="add a directory path to your config")
     maingrp.add_argument("-e", dest="add_extension", metavar=(".ext", "path"), nargs=2,
@@ -316,23 +318,18 @@ def main() -> typing.Union[int, list]:
         print("TODO")
         return 0
     # add command
-    if args.add_command:
+    if args.add_c or args.add_cc or args.add_ccc:
+        if args.add_c:
+            name, description, replace_str = args.add_c[0], "", ""
+        elif args.add_cc:
+            name, description, replace_str = args.add_cc[0], args.add_cc[1], ""
+        elif args.add_ccc:
+            name, description, replace_str = args.add_ccc[0], args.add_ccc[1], args.add_ccc[2]
         spell = {
             "cmd": args.command,
-            "desc": "",
-            "name": "",
-            "replace-str": ""
-        }
-        spellbook["spells"].append(spell)
-        writeJson(config["spellbook"], spellbook, True)
-        return 0
-    # add command with comments (name, description, replace-str)
-    if args.add_command_comments:
-        spell = {
-            "cmd": args.command,
-            "desc": args.add_command_comments[1],
-            "name": args.add_command_comments[0],
-            "replace-str": args.add_command_comments[2]
+            "desc": description,
+            "name": name,
+            "replace-str": replace_str
         }
         spellbook["spells"].append(spell)
         writeJson(config["spellbook"], spellbook, True)

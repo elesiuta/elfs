@@ -101,6 +101,7 @@ optional arguments:
     - following the same example with `position=2`, `command=["myscript.py", "option", ""]`
     - and `command=["myscript.py", "option", "op"]`
   - eg. `"position == 2 and command[1] in ['option1', 'option2']"`
+- the completions are shown for every expression that evaluates as true
 - the completion rules can be placed in either of the following locations
   - inside `file_name.ext.elfs.json`, eg. `myscript.py.elfs.json`
   - or directly enclosed in `file_name.ext` with `# TAB-COMPLETION START` and `# TAB-COMPLETION END`

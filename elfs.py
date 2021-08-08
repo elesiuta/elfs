@@ -112,8 +112,9 @@ def getCompletions(command: list, command_str: str, last_char: str, file_dict: d
     if (position == 1) or (position == 2 and command[1] in ["-n", "--dry-run"]):
         completions += [
             "-h\thelp",
-            "-c\tadd command",
-            "-cc\tadd name desc rs command",
+            "-c\tadd name command",
+            "-cc\tadd name desc command",
+            "-ccc\tadd name desc rs command",
             "-d\tadd directory",
             "-e\tadd extension",
             "-l\tlist",

@@ -16,17 +16,19 @@ elfs --reg-xonsh
 ```
 usage: elfs [options] [command [initial-arguments ...]]
 
-Enhanced aLiases For Shells
+Almost, but not quite, entirely unlike aliases
 
 optional arguments:
-  -h, --help        show this help message and exit
-  -c                add the command to your spellbook
-  -cc name desc rs  add the command to your spellbook with comments
-  -d path           add a directory path to your config
-  -e .ext path      add an extension and the path to an executable for it
-  -l, --list        list entire collection (or specify: cmd, dir, ext, files)
-  -s, --search      search entire collection for command
-  -n, --dry-run     print command instead of executing it
+  -h, --help         show this help message and exit
+  -c name            add the command to your spellbook
+  -cc name desc      also add description with command
+  -ccc name desc rs  also add replace-str with command
+  -d path            add a directory path to your config
+  -e .ext path       add an extension and the path to an executable for it
+  -l, --list         list entire collection (or specify: cmd, dir, ext, files)
+  -s, --search       search entire collection for command
+  -n, --dry-run      print command instead of executing it
+  --version          show program's version number and exit
 ```
 ### Usage Notes
 - Runs on any platform with python 3
@@ -48,12 +50,12 @@ optional arguments:
 - add an extension to run a file with a specific executable  
 ```> elfs -e .py /path/to/alternative/env/for/python```
 - add a command  
-```> elfs -cc spam "echo spam to output 3 times" "" echo spam spam spam```
+```> elfs -cc spam "echo spam to output 3 times" echo spam spam spam```
 - run the command  
 ```> elfs spam```
 > spam spam spam
 - add a command with a replace-str (metavar: rs) and run it  
-```> elfs -cc menu "even more spam" {} echo spam {} spam {}```  
+```> elfs -ccc menu "even more spam" {} echo spam {} spam {}```  
 ```> elfs menu bacon eggs```
 > spam bacon spam eggs
 - giving fewer arguments causes them to repeat  
@@ -63,7 +65,7 @@ optional arguments:
 ```> elfs menu bacon eggs sausage spam```
 > spam bacon spam eggs sausage spam
 - command chaining (needs to run in a shell, elfs uses Popen shell=False)  
-```> elfs -cc "double spam" "" "" bash -c "echo spam && echo spam"```  
+```> elfs -c "double spam" bash -c "echo spam && echo spam"```  
 ```> elfs "double spam"```
 > spam spam
 - see the command without running it (quotes may appear slightly different)  
@@ -74,9 +76,9 @@ optional arguments:
 - search commands and files with fuzzy matches, then optionally select from a list of matches to execute  
 ```> elfs -s dble spam```
 - add a command to quickly edit your config  
-```> elfs -cc "config" "" "" nano ~/.config/elfs/config.json```
+```> elfs -c "config" nano ~/.config/elfs/config.json```
 - or add a command to edit your spellbook (you can move this file)  
-```> elfs -cc "spells" "" "" nano ~/.config/elfs/spellbook.json```
+```> elfs -c "spells" nano ~/.config/elfs/spellbook.json```
 ### Add dynamic tab-completion to your scripts
 - create completion rules in the following json format
 ```json

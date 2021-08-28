@@ -32,7 +32,7 @@ import subprocess
 import sys
 import typing
 
-VERSION = "1.3.4"
+VERSION = "1.3.6"
 
 
 def initParser() -> argparse.ArgumentParser:
@@ -415,15 +415,18 @@ def main() -> typing.Union[int, list]:
                 search_str in spell["desc"] or spell["desc"] in fuzzy_search or
                 search_str in " ".join(spell["cmd"]) or " ".join(spell["cmd"]) in fuzzy_search
             ):
-                search_results.append({"label": shlex.join(spell["cmd"]), "type": "spellbook", "spell": spell})
+                search_results.append({"label": shlex.join(spell["cmd"]), "type": "spellbook", "spell": spell, "name": spell["name"]})
         if len(search_results) == 0:
             print(colourStr("No matches found", "Y"))
             return 0
-        print(colourStr("Search results:", "V"))
+        print(colourStr("Search results", "V"))
         for i in range(len(search_results)):
-            print(colourStr(str(i) + ". ", "G"), search_results[i]["label"])
+            if search_results[i]["type"] == "spellbook" and search_results[i]["name"]:
+                print(colourStr(str(i) + ".", "G"), colourStr("" + search_results[i]["name"] + ":", "B"), search_results[i]["label"])
+            else:
+                print(colourStr(str(i) + ".", "G"), search_results[i]["label"])
         print("Enter a " + colourStr("number", "G") + " to select and run a match, anything else to cancel")
-        print("Supply any extra arguments (if needed) separated by spaces")
+        print("Supply any extra arguments (if needed) separated by a space")
         if not sys.stdin.isatty():
             print(colourStr("Warning: stdin is not connected to a terminal", "Y"))
         search_input = input(">>> ")
